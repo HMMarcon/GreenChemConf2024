@@ -1,5 +1,4 @@
-﻿Excel Table S1: acute_dermal dataset,,,,,,
-Compound_name,CASRN,SMILES,InChIKey,LD50,GHS class,Call
+﻿Compound_name,CASRN,SMILES,InChIKey,LD50,GHS class,Call
 1-chloro-4-isocyanatobenzene,104-12-1,O=C=Nc1ccc(Cl)cc1,ADAKRBAJFHTIEW-UHFFFAOYSA-N,3505,5,0
 2-methylnonyl diphenyl phosphite,26544-23-0,CC(C)CCCCCCCOP(Oc1ccccc1)Oc1ccccc1,ADRNSOYXKABLGT-UHFFFAOYSA-N,5000,5,0
 cyclohexanone oxime,100-64-1,O=NC1CCCCC1,AFLQDEOAJRGCOW-UHFFFAOYSA-N,5000,5,0
