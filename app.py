@@ -69,7 +69,9 @@ def train_model():
     df = df.dropna(subset=['SMILES'])
     df = df.drop_duplicates(subset=['SMILES'])
     smiles = df['SMILES']
+    smiles = smiles[:100]
     LD50 = df['LD50']
+    LD50 = LD50[:100]
 
     # Generate fingerprints
     nBits = 512
