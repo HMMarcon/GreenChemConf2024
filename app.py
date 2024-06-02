@@ -11,7 +11,7 @@ import os
 # Function to calculate mean toxicity, uncertainty, and overall danger
 def calculate_toxicity(smiles_list):
     nBits = [512, 128, 64]  # Different bit lengths for the fingerprints
-    filenames = ['XGBRegressor_n512.pkl', 'XGBRegressor_n128.pkl', 'XGBRegressor_n64.pkl']
+    filenames = ['./XGBRegressor_n512.pkl', './XGBRegressor_n128.pkl', './XGBRegressor_n64.pkl']
     # models = [pickle.load(open(filename, 'rb')) for filename in filenames]
     models = []
     for filename in filenames:
