@@ -1,24 +1,50 @@
 import streamlit as st
 import pandas as pd
 from rdkit import Chem
-from rdkit.Chem import Draw
-from rdkit.Chem.Draw import IPythonConsole
+from rdkit.Chem import Draw, AllChem
 from streamlit_ketcher import st_ketcher
+import numpy as np
+import pickle
 
 # Function to calculate mean toxicity, uncertainty, and overall danger
 def calculate_toxicity(smiles_list):
+    nBits = [512, 128, 64]  # Different bit lengths for the fingerprints
+    filenames = ['XGBRegressor_n512.pkl', 'XGBRegressor_n128.pkl', 'XGBRegressor_n64.pkl']
+    models = [pickle.load(open(filename, 'rb')) for filename in filenames]
+
+    all_predictions = []
+
+    for nBit, model in zip(nBits, models):
+        fps = []
+        # Generate fingerprints for the input SMILES
+        for smiles in smiles_list:
+            mol = Chem.MolFromSmiles(smiles)
+            if mol is not None:
+                fp = AllChem.GetMorganFingerprintAsBitVect(mol, useChirality=True, radius=2, nBits=nBit)
+                vector = np.array(fp)
+                fps.append(vector)
+            else:
+                fps.append(np.zeros((nBit,), dtype=int))  # Handle invalid SMILES strings
+
+        X_input = np.array(fps)
+        y_pred = model.predict(X_input)
+        all_predictions.append(y_pred)
+
+    all_predictions = np.array(all_predictions)
+    mean_predictions = np.mean(all_predictions, axis=0)
+    uncertainties = np.std(all_predictions, axis=0)
+
     data = []
-    for idx, smiles in enumerate(smiles_list):
-        mean_toxicity = 10  # Placeholder value
-        uncertainty = 1     # Placeholder value
-        overall_danger = mean_toxicity + uncertainty
+    for idx, (smiles, mean_pred, uncertainty) in enumerate(zip(smiles_list, mean_predictions, uncertainties)):
+        overall_danger = mean_pred + uncertainty
         data.append({
             'Ranking': idx + 1,
             'SMILES': smiles,
-            'Mean Toxicity': mean_toxicity,
+            'Mean Toxicity': mean_pred,
             'Uncertainty': uncertainty,
             'Overall Danger': overall_danger
         })
+
     return pd.DataFrame(data)
 
 # Initialize session state for smiles_list
