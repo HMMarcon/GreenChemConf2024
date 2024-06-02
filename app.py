@@ -1,7 +1,8 @@
 import streamlit as st
 import pandas as pd
 from rdkit import Chem
-from rdkit.Chem import Draw, AllChem
+from rdkit.Chem import AllChem
+# from rdkit.Chem import Draw, AllChem
 from streamlit_ketcher import st_ketcher
 import numpy as np
 import pickle
@@ -113,9 +114,9 @@ st.subheader("Case Study: Reaction By-Products")
 st.write("There are many potential cases for the generation of unknown chemicals during an experiment. Running a new reaction, scaling up a reaction, or optimizing the reaction can all result in potentially toxic byproducts that can be difficult to test or product. By separating an impure mixture via LC-MS/GC-MS into fragments, the Chemical Toxicity Alert System (CTAS) can detect the compounds that have the highest potential to be toxic and classify their toxicity from the generated list of impurities, allowing for rapid detection of potentially toxic byproducts.This AI-powered technology simplifies laboratory safety protocols and is a vital tool for any chemist looking to develop greener methods. ")
 st.image("figures/mass spec.jpg")  
 
-# Optionally, visualize the molecules using rdkit
-st.subheader("Molecule Visualizations")
-for smiles in st.session_state.smiles_list:
-    mol = Chem.MolFromSmiles(smiles)
-    if mol:
-        st.image(Draw.MolToImage(mol), caption=smiles)
+# # Optionally, visualize the molecules using rdkit
+# st.subheader("Molecule Visualizations")
+# for smiles in st.session_state.smiles_list:
+#     mol = Chem.MolFromSmiles(smiles)
+#     if mol:
+#         st.image(Draw.MolToImage(mol), caption=smiles)
