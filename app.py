@@ -33,6 +33,8 @@ with col1:
 with col2:
     st.title("Chemical Toxicity Alert System")
 
+st.text("The Chemical Toxicity Alert System is a simple method for analyzing a compound or list of compounds. Simply input the chemicals you wish to analyze, and CTAS will not only generate a ranked list of the most toxic compounds, but also a numerical indicator of toxicity.")
+
 
 # Dropdown to select input method
 input_method = st.selectbox("Select input method", ["SMILES", "Draw Compound"])
@@ -72,14 +74,14 @@ if st.button("Run"):
         st.dataframe(df)
 
 # Case Study 1
-st.subheader("Case Study 1")
+st.subheader("Case Study: Watershed Testing")
 st.write("In the Environmental Protection sector of the government we have been able to use the Chemical Toxicity Alert System in order to know the toxicity of both residential and commercial illicit discharge. This allowed us to input a list of chemicals released in these spills and see the toxicity of the chemicals. We then can know if the area needs to be pumped out. Understanding the toxicity of chemicals is one of the most important parts of the job so having software that requires little chemical experience allows us to complete our jobs more effectively.")
 st.image("figures/Guy Sampling.jpg")  # Placeholder image URL
 
 # Case Study 2
-st.subheader("Case Study 2")
-st.write("Lorem ipsum, lorem ipsum")
-st.image("https://via.placeholder.com/300")  # Placeholder image URL
+st.subheader("Case Study: Reaction By-Products")
+st.write("There are many potential cases for the generation of unknown chemicals during an experiment. Running a new reaction, scaling up a reaction, or optimizing the reaction can all result in potentially toxic byproducts that can be difficult to test or product. By separating an impure mixture via LC-MS/GC-MS into fragments, the Chemical Toxicity Alert System (CTAS) can detect the compounds that have the highest potential to be toxic and classify their toxicity from the generated list of impurities, allowing for rapid detection of potentially toxic byproducts.This AI-powered technology simplifies laboratory safety protocols and is a vital tool for any chemist looking to develop greener methods. ")
+st.image("figures/mass spec.jpg")  
 
 # Optionally, visualize the molecules using rdkit
 st.subheader("Molecule Visualizations")
