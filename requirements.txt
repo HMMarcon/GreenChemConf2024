@@ -1,3 +1,2 @@
 rdkit-pypi
 streamlit_ketcher
-pickle
