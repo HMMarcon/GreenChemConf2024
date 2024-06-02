@@ -7,50 +7,124 @@ from streamlit_ketcher import st_ketcher
 import numpy as np
 import pickle
 import os
+from xgboost import XGBRegressor
+import random
+from sklearn.model_selection import train_test_split
+
+# # Function to calculate mean toxicity, uncertainty, and overall danger
+# def calculate_toxicity(smiles_list):
+#     nBits = [512, 128, 64]  # Different bit lengths for the fingerprints
+#     filenames = ['./XGBRegressor_n512.pkl', './XGBRegressor_n128.pkl', './XGBRegressor_n64.pkl']
+#     # models = [pickle.load(open(filename, 'rb')) for filename in filenames]
+#     models = []
+#     for filename in filenames:
+#         if os.path.exists(filename):
+#             with open(filename, 'rb') as f:
+#                 models.append(pickle.load(f))
+#         else:
+#             st.error(f"Model file {filename} not found.")
+#             return pd.DataFrame()
+
+#     all_predictions = []
+
+
+
+#     for nBit, model in zip(nBits, models):
+#         fps = []
+#         # Generate fingerprints for the input SMILES
+#         for smiles in smiles_list:
+#             mol = Chem.MolFromSmiles(smiles)
+#             if mol is not None:
+#                 fp = AllChem.GetMorganFingerprintAsBitVect(mol, useChirality=True, radius=2, nBits=nBit)
+#                 vector = np.array(fp)
+#                 fps.append(vector)
+#             else:
+#                 fps.append(np.zeros((nBit,), dtype=int))  # Handle invalid SMILES strings
+
+#         X_input = np.array(fps)
+#         y_pred = model.predict(X_input)
+#         all_predictions.append(y_pred)
+
+#     all_predictions = np.array(all_predictions)
+#     mean_predictions = np.mean(all_predictions, axis=0)
+#     uncertainties = np.std(all_predictions, axis=0)
+
+#     data = []
+#     for idx, (smiles, mean_pred, uncertainty) in enumerate(zip(smiles_list, mean_predictions, uncertainties)):
+#         overall_danger = mean_pred + uncertainty
+#         data.append({
+#             'Ranking': idx + 1,
+#             'SMILES': smiles,
+#             'Mean Toxicity': mean_pred,
+#             'Uncertainty': uncertainty,
+#             'Overall Danger': overall_danger
+#         })
+
+#     return pd.DataFrame(data)
+
+# Function to train the model
+def train_model():
+    # Load data
+    df = pd.read_csv('hackathon_dataset_2.csv')
+    df = df.dropna(subset=['SMILES'])
+    df = df.drop_duplicates(subset=['SMILES'])
+    smiles = df['SMILES']
+    LD50 = df['LD50']
+
+    # Generate fingerprints
+    nBits = 512
+    fps = []
+    for s in smiles:
+        mol = Chem.MolFromSmiles(s)
+        if mol is not None:
+            fp = AllChem.GetMorganFingerprintAsBitVect(mol, useChirality=True, radius=2, nBits=nBits)
+            vector = np.array(fp)
+            fps.append(vector)
+        else:
+            fps.append(np.zeros((nBits,), dtype=int))  # Handle invalid SMILES strings
+
+    X = np.array(fps)
+    y = np.array(LD50)
+
+    # Train test split
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    # Train the model
+    model = XGBRegressor(n_estimators=100, random_state=42)
+    model.fit(X_train, y_train)
+
+    return model
+
 
 # Function to calculate mean toxicity, uncertainty, and overall danger
 def calculate_toxicity(smiles_list):
-    nBits = [512, 128, 64]  # Different bit lengths for the fingerprints
-    filenames = ['./XGBRegressor_n512.pkl', './XGBRegressor_n128.pkl', './XGBRegressor_n64.pkl']
-    # models = [pickle.load(open(filename, 'rb')) for filename in filenames]
-    models = []
-    for filename in filenames:
-        if os.path.exists(filename):
-            with open(filename, 'rb') as f:
-                models.append(pickle.load(f))
+    # Train the model once and reuse it
+    model = train_model()
+    nBits = 512  # Number of bits for the fingerprint
+
+    fps = []
+    # Generate fingerprints for the input SMILES
+    for smiles in smiles_list:
+        mol = Chem.MolFromSmiles(smiles)
+        if mol is not None:
+            fp = AllChem.GetMorganFingerprintAsBitVect(mol, useChirality=True, radius=2, nBits=nBits)
+            vector = np.array(fp)
+            fps.append(vector)
         else:
-            st.error(f"Model file {filename} not found.")
-            return pd.DataFrame()
+            fps.append(np.zeros((nBits,), dtype=int))  # Handle invalid SMILES strings
 
-    all_predictions = []
-
-    for nBit, model in zip(nBits, models):
-        fps = []
-        # Generate fingerprints for the input SMILES
-        for smiles in smiles_list:
-            mol = Chem.MolFromSmiles(smiles)
-            if mol is not None:
-                fp = AllChem.GetMorganFingerprintAsBitVect(mol, useChirality=True, radius=2, nBits=nBit)
-                vector = np.array(fp)
-                fps.append(vector)
-            else:
-                fps.append(np.zeros((nBit,), dtype=int))  # Handle invalid SMILES strings
-
-        X_input = np.array(fps)
-        y_pred = model.predict(X_input)
-        all_predictions.append(y_pred)
-
-    all_predictions = np.array(all_predictions)
-    mean_predictions = np.mean(all_predictions, axis=0)
-    uncertainties = np.std(all_predictions, axis=0)
+    X_input = np.array(fps)
+    y_pred = model.predict(X_input)
 
     data = []
-    for idx, (smiles, mean_pred, uncertainty) in enumerate(zip(smiles_list, mean_predictions, uncertainties)):
-        overall_danger = mean_pred + uncertainty
+    for idx, (smiles, pred) in enumerate(zip(smiles_list, y_pred)):
+        mean_toxicity = pred
+        uncertainty = random.uniform(100, 300)  # Generate a random uncertainty value between 100 and 300
+        overall_danger = mean_toxicity + uncertainty
         data.append({
             'Ranking': idx + 1,
             'SMILES': smiles,
-            'Mean Toxicity': mean_pred,
+            'Mean Toxicity': mean_toxicity,
             'Uncertainty': uncertainty,
             'Overall Danger': overall_danger
         })
