@@ -74,7 +74,7 @@ def train_model():
     LD50 = LD50[:100]
 
     # Generate fingerprints
-    nBits = 512
+    nBits = 64
     fps = []
     for s in smiles:
         mol = Chem.MolFromSmiles(s)
@@ -102,7 +102,7 @@ def train_model():
 def calculate_toxicity(smiles_list):
     # Train the model once and reuse it
     model = train_model()
-    nBits = 512  # Number of bits for the fingerprint
+    nBits = 64  # Number of bits for the fingerprint
 
     fps = []
     # Generate fingerprints for the input SMILES
