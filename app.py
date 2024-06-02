@@ -69,12 +69,12 @@ def train_model():
     df = df.dropna(subset=['SMILES'])
     df = df.drop_duplicates(subset=['SMILES'])
     smiles = df['SMILES']
-    smiles = smiles[:100]
+    smiles = smiles[:50]
     LD50 = df['LD50']
-    LD50 = LD50[:100]
+    LD50 = LD50[:50]
 
     # Generate fingerprints
-    nBits = 64
+    nBits = 32
     fps = []
     for s in smiles:
         mol = Chem.MolFromSmiles(s)
@@ -102,7 +102,7 @@ def train_model():
 def calculate_toxicity(smiles_list):
     # Train the model once and reuse it
     model = train_model()
-    nBits = 64  # Number of bits for the fingerprint
+    nBits = 32  # Number of bits for the fingerprint
 
     fps = []
     # Generate fingerprints for the input SMILES
@@ -192,12 +192,12 @@ st.write("___")
 # Case Study 1
 st.subheader("Case Study: Watershed Testing")
 st.write("In the Environmental Protection sector of the government we have been able to use the Chemical Toxicity Alert System in order to know the toxicity of both residential and commercial illicit discharge. This allowed us to input a list of chemicals released in these spills and see the toxicity of the chemicals. We then can know if the area needs to be pumped out. Understanding the toxicity of chemicals is one of the most important parts of the job so having software that requires little chemical experience allows us to complete our jobs more effectively.")
-st.image("figures/Guy Sampling.jpg")  # Placeholder image URL
+st.image("figures/Guy Sampling.png")  # Placeholder image URL
 
 # Case Study 2
 st.subheader("Case Study: Reaction By-Products")
 st.write("There are many potential cases for the generation of unknown chemicals during an experiment. Running a new reaction, scaling up a reaction, or optimizing the reaction can all result in potentially toxic byproducts that can be difficult to test or product. By separating an impure mixture via LC-MS/GC-MS into fragments, the Chemical Toxicity Alert System (CTAS) can detect the compounds that have the highest potential to be toxic and classify their toxicity from the generated list of impurities, allowing for rapid detection of potentially toxic byproducts.This AI-powered technology simplifies laboratory safety protocols and is a vital tool for any chemist looking to develop greener methods. ")
-st.image("figures/mass spec.jpg")  
+st.image("figures/mass spec.png")  
 
 # # Optionally, visualize the molecules using rdkit
 # st.subheader("Molecule Visualizations")
