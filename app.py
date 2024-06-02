@@ -33,7 +33,7 @@ with col1:
 with col2:
     st.title("Chemical Toxicity Alert System")
 
-st.text("The Chemical Toxicity Alert System is a simple method for analyzing a compound or list of compounds. Simply input the chemicals you wish to analyze, and CTAS will not only generate a ranked list of the most toxic compounds, but also a numerical indicator of toxicity.")
+st.write("The Chemical Toxicity Alert System is a simple method for analyzing a compound or list of compounds. Simply input the chemicals you wish to analyze, and CTAS will not only generate a ranked list of the most toxic compounds, but also a numerical indicator of toxicity.")
 
 
 # Dropdown to select input method
@@ -72,6 +72,10 @@ if st.button("Run"):
         st.subheader("Ranked List of Compounds")
         df = calculate_toxicity(st.session_state.smiles_list)
         st.dataframe(df)
+
+
+# print a line break
+st.write("___")
 
 # Case Study 1
 st.subheader("Case Study: Watershed Testing")
