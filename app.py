@@ -73,8 +73,8 @@ if st.button("Run"):
 
 # Case Study 1
 st.subheader("Case Study 1")
-st.write("Lorem ipsum, lorem ipsum")
-st.image("https://via.placeholder.com/300")  # Placeholder image URL
+st.write("In the Environmental Protection sector of the government we have been able to use the Chemical Toxicity Alert System in order to know the toxicity of both residential and commercial illicit discharge. This allowed us to input a list of chemicals released in these spills and see the toxicity of the chemicals. We then can know if the area needs to be pumped out. Understanding the toxicity of chemicals is one of the most important parts of the job so having software that requires little chemical experience allows us to complete our jobs more effectively.")
+st.image("figures/Guy Sampling.jpg")  # Placeholder image URL
 
 # Case Study 2
 st.subheader("Case Study 2")
