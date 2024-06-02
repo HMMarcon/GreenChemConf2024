@@ -6,12 +6,21 @@ from rdkit.Chem import AllChem
 from streamlit_ketcher import st_ketcher
 import numpy as np
 import pickle
+import os
 
 # Function to calculate mean toxicity, uncertainty, and overall danger
 def calculate_toxicity(smiles_list):
     nBits = [512, 128, 64]  # Different bit lengths for the fingerprints
     filenames = ['XGBRegressor_n512.pkl', 'XGBRegressor_n128.pkl', 'XGBRegressor_n64.pkl']
-    models = [pickle.load(open(filename, 'rb')) for filename in filenames]
+    # models = [pickle.load(open(filename, 'rb')) for filename in filenames]
+    models = []
+    for filename in filenames:
+        if os.path.exists(filename):
+            with open(filename, 'rb') as f:
+                models.append(pickle.load(f))
+        else:
+            st.error(f"Model file {filename} not found.")
+            return pd.DataFrame()
 
     all_predictions = []
 
