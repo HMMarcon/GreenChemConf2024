@@ -3,4 +3,3 @@ streamlit_ketcher
 scikit-learn
 pandas
 numpy
-pickle
