@@ -13,10 +13,41 @@ from sklearn.model_selection import train_test_split
 
 # Function to calculate mean toxicity, uncertainty, and overall danger
 def calculate_toxicity(smiles_list):
-    # just create random values for between 100 to 10000 for mean and, and 100 to 5000 uncertainty
-    for s in smiles_list:
-        mean_predictions = [random.randint(100, 10000) for _ in range(len(smiles_list))]
-        uncertainties = [random.randint(100, 5000) for _ in range(len(smiles_list))]
+    nBits = [512, 128, 64]  # Different bit lengths for the fingerprints
+    filenames = ['./XGBRegressor_n512.pkl', './XGBRegressor_n128.pkl', './XGBRegressor_n64.pkl']
+    # models = [pickle.load(open(filename, 'rb')) for filename in filenames]
+    models = []
+    for filename in filenames:
+        if os.path.exists(filename):
+            with open(filename, 'rb') as f:
+                models.append(pickle.load(f))
+        else:
+            st.error(f"Model file {filename} not found.")
+            return pd.DataFrame()
+
+    all_predictions = []
+
+
+
+    for nBit, model in zip(nBits, models):
+        fps = []
+        # Generate fingerprints for the input SMILES
+        for smiles in smiles_list:
+            mol = Chem.MolFromSmiles(smiles)
+            if mol is not None:
+                fp = AllChem.GetMorganFingerprintAsBitVect(mol, useChirality=True, radius=2, nBits=nBit)
+                vector = np.array(fp)
+                fps.append(vector)
+            else:
+                fps.append(np.zeros((nBit,), dtype=int))  # Handle invalid SMILES strings
+
+        X_input = np.array(fps)
+        y_pred = model.predict(X_input)
+        all_predictions.append(y_pred)
+
+    all_predictions = np.array(all_predictions)
+    mean_predictions = np.mean(all_predictions, axis=0)
+    uncertainties = np.std(all_predictions, axis=0)
 
     data = []
     for idx, (smiles, mean_pred, uncertainty) in enumerate(zip(smiles_list, mean_predictions, uncertainties)):
@@ -30,7 +61,6 @@ def calculate_toxicity(smiles_list):
         })
 
     return pd.DataFrame(data)
-
 
 
 # Initialize session state for smiles_list
@@ -92,7 +122,7 @@ st.write("___")
 # Case Study 1
 st.subheader("Case Study: Watershed Testing")
 st.write("In the Environmental Protection sector of the government we have been able to use the Chemical Toxicity Alert System in order to know the toxicity of both residential and commercial illicit discharge. This allowed us to input a list of chemicals released in these spills and see the toxicity of the chemicals. We then can know if the area needs to be pumped out. Understanding the toxicity of chemicals is one of the most important parts of the job so having software that requires little chemical experience allows us to complete our jobs more effectively.")
-# st.image("figures/Guy_Sampling.png")  # Placeholder image URL
+st.image("figures/Guy_Sampling.png")  # Placeholder image URL
 
 # Case Study 2
 st.subheader("Case Study: Reaction By-Products")
@@ -102,6 +132,9 @@ st.image("figures/mass_spec.png")
 # # Optionally, visualize the molecules using rdkit
 # st.subheader("Molecule Visualizations")
 # for smiles in st.session_state.smiles_list:
+#     mol = Chem.MolFromSmiles(smiles)
+#     if mol:
+#         st.image(Draw.MolToImage(mol), caption=smiles)
 #     mol = Chem.MolFromSmiles(smiles)
 #     if mol:
 #         st.image(Draw.MolToImage(mol), caption=smiles)
